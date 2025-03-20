@@ -22,16 +22,23 @@ export default function ChatPage() {
             </ul>
           </div>
         </div>
-        
-        {/* Main Chat Interface */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <ChatInterface className="flex-1 overflow-y-auto" />
+
+        {/* Main Compliance List - Now Center Stage */}
+        <div className="flex-1 border-r border-gray-100 overflow-y-auto p-6">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-2xl font-bold text-gray-800 mb-6">Compliance Requirements</h1>
+            <ComplianceList />
+          </div>
         </div>
 
-        {/* Right Panel - Compliance Documents */}
-        <div className="w-64 border-l border-gray-100 p-4 bg-gray-100 flex flex-col">
-          <h2 className="text-sm font-semibold text-gray-600 mb-4">Required Compliance Documents</h2>
-          <ComplianceList />
+        {/* Right Panel - Compact Chat */}
+        <div className="w-96 border-l border-gray-100 flex flex-col">
+          <div className="p-4 border-b border-gray-100">
+            <h2 className="text-sm font-semibold text-gray-600">Compliance Assistant</h2>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <ChatInterface className="h-full" />
+          </div>
         </div>
       </div>
     </div>

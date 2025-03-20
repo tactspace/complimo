@@ -1,4 +1,5 @@
 backend/.DS_Store
+backend/env
 
 frontend/node_modules
 frontend/dist
@@ -6,3 +7,12 @@ frontend/build
 frontend/coverage
 frontend/logs
 frontend/public/uploads
+frontend/.next
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+frontend/.env.test
+
+
+backend/chroma_db

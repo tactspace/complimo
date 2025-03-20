@@ -1,11 +1,27 @@
 "use client";
 
 export default function FileUpload() {
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      // Handle file upload logic here
-      console.log('Files uploaded:', files);
+      const formData = new FormData();
+      Array.from(files).forEach(file => {
+        formData.append('files', file);
+      });
+
+      try {
+        const response = await fetch('http://0.0.0.0:8000/index-pdf', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to upload files');
+        }
+        console.log('Files successfully indexed:', await response.json());
+      } catch (error) {
+        console.error('Error uploading files:', error);
+      }
     }
   };
 

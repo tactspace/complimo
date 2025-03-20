@@ -17,7 +17,7 @@ export default function Home() {
             We're excited to have you here. Explore our services and discover how we can help you achieve your goals.
           </p>
           <a
-            href="#"
+            href="/chat"
             className="inline-block rounded-full bg-[#FF6600] text-white px-8 py-3 font-semibold text-lg transition-all hover:bg-[#FF6600]/90 hover:shadow-lg"
           >
             Get Started

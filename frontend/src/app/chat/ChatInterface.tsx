@@ -1,12 +1,35 @@
 import { useState, useRef, useEffect } from 'react';
 
-type Message = {
+interface Message {
+  id: number;
   content: string;
   isUser: boolean;
-};
+  timestamp?: Date;
+}
+
+const mockMessages: Message[] = [
+  {
+    id: 1,
+    content: "Welcome to Complimo! How can I assist you today?",
+    isUser: false,
+    timestamp: new Date(Date.now() - 60000)
+  },
+  {
+    id: 2,
+    content: "I need help with compliance regulations.",
+    isUser: true,
+    timestamp: new Date(Date.now() - 30000)
+  },
+  {
+    id: 3,
+    content: "I'd be happy to help. Could you specify which industry or region you're referring to?",
+    isUser: false,
+    timestamp: new Date(Date.now() - 15000)
+  },
+];
 
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -22,34 +45,48 @@ export default function ChatInterface() {
     if (!inputMessage.trim()) return;
     
     // Add user message
-    setMessages(prev => [...prev, { content: inputMessage, isUser: true }]);
+    setMessages(prev => [...prev, { 
+      id: Date.now(),
+      content: inputMessage,
+      isUser: true,
+      timestamp: new Date()
+    }]);
     
     // Simulate AI response
     setInputMessage('');
     const response = await generateMockResponse(inputMessage);
-    setMessages(prev => [...prev, { content: response, isUser: false }]);
+    setMessages(prev => [...prev, { 
+      id: Date.now(),
+      content: response,
+      isUser: false,
+      timestamp: new Date()
+    }]);
   };
 
   return (
     <div className="flex flex-col h-screen  bg-white font-[family-name:var(--font-geist-sans)]">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-          >
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="max-w-3xl mx-auto space-y-4">
+          {messages.map((message) => (
             <div
-              className={`max-w-3xl p-4 rounded-lg ${
-                message.isUser
-                  ? 'bg-[#FF6600] text-white'
-                  : 'bg-gray-50 text-gray-800 border border-gray-100'
-              }`}
+              key={message.id}
+              className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
             >
-              {message.content}
+              <div
+                className={`max-w-[50%] p-3 ${
+                  message.isUser
+                    ? 'bg-[#FF6600] text-white rounded-xl rounded-br-sm ml-6'
+                    : 'bg-gray-300 rounded-xl rounded-tl-sm mr-6'
+                }`}
+              >
+                <p className={`text-sm leading-snug ${message.isUser ? 'text-white' : 'text-gray-600'}`}>
+                  {message.content}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
       
       <div className="border-t p-4 bg-gray-50">

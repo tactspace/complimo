@@ -154,6 +154,35 @@ async def index_pdf(files: list[UploadFile] = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/documents")
+async def get_documents():
+    try:
+        # Initialize Chroma connection
+        embedding_model = OpenAIEmbeddings()
+        chroma = Chroma(
+            persist_directory="./chroma_db",
+            embedding_function=embedding_model
+        )
+        
+        # Get all documents and metadata
+        collection = chroma._collection
+        docs = collection.get()
+        
+        # Format documents with metadata
+        documents = []
+        for content, metadata in zip(docs['documents'], docs['metadatas']):
+            documents.append({
+                "content": content,
+                "source": metadata.get('source', 'unknown')
+            })
+        
+        return {
+            "count": len(documents),
+            "documents": documents
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 

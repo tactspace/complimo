@@ -13,3 +13,6 @@ frontend/.env.local
 frontend/.env.development
 frontend/.env.production
 frontend/.env.test
+
+
+backend/chroma_db

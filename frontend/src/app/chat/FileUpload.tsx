@@ -1,9 +1,16 @@
 "use client";
+import { useState } from 'react';
 
 export default function FileUpload() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
+      setIsLoading(true);
+      setIsSuccess(false);
+      
       const formData = new FormData();
       Array.from(files).forEach(file => {
         formData.append('files', file);
@@ -19,8 +26,13 @@ export default function FileUpload() {
           throw new Error('Failed to upload files');
         }
         console.log('Files successfully indexed:', await response.json());
+        setIsSuccess(true);
+        setTimeout(() => setIsSuccess(false), 3000); // Hide success after 3 seconds
       } catch (error) {
         console.error('Error uploading files:', error);
+        setIsSuccess(false);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -36,7 +48,16 @@ export default function FileUpload() {
       />
       <label htmlFor="file-upload" className="cursor-pointer">
         <div className="text-gray-500 text-sm">
-          Click to upload or drag and drop
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-[#FF6600] border-t-transparent rounded-full animate-spin"></div>
+              Uploading...
+            </div>
+          ) : isSuccess ? (
+            <div className="text-green-500">✓ Upload complete!</div>
+          ) : (
+            'Click to upload or drag and drop'
+          )}
         </div>
       </label>
     </div>

@@ -62,7 +62,7 @@ def startup_db_client():
         print("-" * 50)
     
     # Initialize LLM
-    llm = ChatOpenAI(model_name="gpt-4o", temperature=0.3)
+    llm = ChatOpenAI(model_name="gpt-4o", temperature=0.1)
     
     # Create RAG chain
     rag_chain = RetrievalQA.from_chain_type(
@@ -89,7 +89,7 @@ async def chat(request: ChatWithHistoryRequest):
             enhanced_query = f"""Previous conversation:
 {context}
 
-Based on this conversation history, please answer the user's current question: {query}"""
+Based on this conversation history, please answer the user's current question: {query}. Answer in pure text, no markdown, no HTML."""
         else:
             enhanced_query = query
         
@@ -124,8 +124,8 @@ async def index_pdf(files: list[UploadFile] = File(...)):
         
         # PDF processing and indexing
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200
+            chunk_size=8000,
+            chunk_overlap=500
         )
         embeddings = OpenAIEmbeddings()
         

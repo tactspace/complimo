@@ -31,6 +31,7 @@ const mockMessages: Message[] = [
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -44,7 +45,6 @@ export default function ChatInterface() {
   const handleSend = async () => {
     if (!inputMessage.trim()) return;
     
-    // Add user message
     const userMessage = { 
       id: Date.now(),
       content: inputMessage,
@@ -52,17 +52,13 @@ export default function ChatInterface() {
       timestamp: new Date()
     };
     
-    // Create updated messages array with the new user message
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
-    
-    // Clear input
-    const userQuery = inputMessage;
     setInputMessage('');
     
     try {
-      // Pass both the query and conversation history to the API
-      const response = await fetchChatResponse(userQuery, updatedMessages);
+      setIsLoading(true);
+      const response = await fetchChatResponse(inputMessage, updatedMessages);
       setMessages(prev => [...prev, { 
         id: Date.now(),
         content: response,
@@ -70,7 +66,6 @@ export default function ChatInterface() {
         timestamp: new Date()
       }]);
     } catch (error) {
-      // Handle error in case API call fails
       console.error("Error fetching response:", error);
       setMessages(prev => [...prev, { 
         id: Date.now(),
@@ -78,6 +73,8 @@ export default function ChatInterface() {
         isUser: false,
         timestamp: new Date()
       }]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -103,6 +100,17 @@ export default function ChatInterface() {
               </div>
             </div>
           ))}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="max-w-[50%] p-3 bg-gray-300 rounded-xl rounded-tl-sm mr-6">
+                <div className="flex space-x-2 justify-center items-center">
+                  <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                  <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                  <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce"></div>
+                </div>
+              </div>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
       </div>

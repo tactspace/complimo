@@ -45,22 +45,40 @@ export default function ChatInterface() {
     if (!inputMessage.trim()) return;
     
     // Add user message
-    setMessages(prev => [...prev, { 
+    const userMessage = { 
       id: Date.now(),
       content: inputMessage,
       isUser: true,
       timestamp: new Date()
-    }]);
+    };
     
-    // Simulate AI response
+    // Create updated messages array with the new user message
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    
+    // Clear input
+    const userQuery = inputMessage;
     setInputMessage('');
-    const response = await generateMockResponse(inputMessage);
-    setMessages(prev => [...prev, { 
-      id: Date.now(),
-      content: response,
-      isUser: false,
-      timestamp: new Date()
-    }]);
+    
+    try {
+      // Pass both the query and conversation history to the API
+      const response = await fetchChatResponse(userQuery, updatedMessages);
+      setMessages(prev => [...prev, { 
+        id: Date.now(),
+        content: response,
+        isUser: false,
+        timestamp: new Date()
+      }]);
+    } catch (error) {
+      // Handle error in case API call fails
+      console.error("Error fetching response:", error);
+      setMessages(prev => [...prev, { 
+        id: Date.now(),
+        content: "Sorry, I couldn't process your request. Please try again later.",
+        isUser: false,
+        timestamp: new Date()
+      }]);
+    }
   };
 
   return (
@@ -112,8 +130,36 @@ export default function ChatInterface() {
   );
 }
 
-// Mock AI response generator
-async function generateMockResponse(prompt: string): Promise<string> {
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
-  return "This is a mock response from the AI. In a real implementation, this would be connected to an AI API endpoint.";
+// Modify fetchChatResponse to include conversation history
+async function fetchChatResponse(query: string, messageHistory: Message[]): Promise<string> {
+  try {
+    // Format conversation history to send to the API
+    const conversationHistory = messageHistory.map(msg => ({
+      content: msg.content,
+      isUser: msg.isUser
+    }));
+
+    console.log("History", conversationHistory);
+
+    const response = await fetch('http://0.0.0.0:8000/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        query,
+        conversation_history: conversationHistory 
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.response || "No response received";
+  } catch (error) {
+    console.error("API request error:", error);
+    throw error;
+  }
 }

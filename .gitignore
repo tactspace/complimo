@@ -1,0 +1,8 @@
+backend/.DS_Store
+
+frontend/node_modules
+frontend/dist
+frontend/build
+frontend/coverage
+frontend/logs
+frontend/public/uploads

@@ -127,18 +127,27 @@ export default function Home() {
       <div className="flex-1 p-6 sm:p-8">
         <div className="flex justify-between items-start mb-6">
           <h2 className="text-3xl font-bold text-black">HVAC System Dashboard</h2>
-          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100">
-            <div className={`w-3 h-3 rounded-full ${false ? 'bg-red-500' : 'bg-green-500'}`}></div>
-            <span className="font-medium text-sm text-black">
-              {false ? 'Flow Signal Fault' : 'All Systems Normal'}
-            </span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100">
+              <div className={`w-3 h-3 rounded-full ${false ? 'bg-red-500' : 'bg-green-500'}`}></div>
+              <span className="font-medium text-sm text-black">
+                {false ? 'Flow Signal Fault' : 'All Systems Normal'}
+              </span>
+            </div>
+            <select 
+              className="bg-white border border-gray-100 rounded-lg shadow-sm px-4 py-2 text-sm focus:outline-none focus:ring-2 text-black focus:ring-[#FF6600]"
+              defaultValue="belimo-3"
+            >
+              <option value="belimo-3">Belimo Energy Valve 3</option>
+              <option value="other" disabled>Other Sources (Coming Soon)</option>
+            </select>
           </div>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Power Consumption Graph */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-black mb-4">Power Consumption Trend</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Power Consumption Trend (W)</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={powerData}>
@@ -160,7 +169,7 @@ export default function Home() {
 
           {/* Flow Performance Graph */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-black mb-4">Flow Performance</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Relative Flow % </h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={flowData}>

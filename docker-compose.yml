@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: hvac-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # Configure backend API URL if needed
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    restart: unless-stopped
+    volumes:
+      - ./frontend/public:/app/public
+      - ./frontend/src:/app/src
+      # Exclude node_modules and build artifacts
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - hvac-network
+    # If you have a backend service that the frontend depends on
+    # depends_on:
+    #   - backend
+
+  # Backend service (uncomment and adjust as needed)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: hvac-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Mount for development to enable hot reloading
+      - ./backend:/app
+    networks:
+      - hvac-network
+    restart: unless-stopped
+
+networks:
+  hvac-network:
+    driver: bridge

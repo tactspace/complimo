@@ -97,12 +97,12 @@ export default function ChatInterface() {
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Type your message..."
-            className="flex-1 p-3 border text-black rounded-full focus:outline-none focus:ring-2 focus:ring-[#FF6600] pl-6"
+            className="flex-1 p-2 text-sm border text-black rounded-full focus:outline-none focus:ring-2 focus:ring-[#FF6600] pl-4"
             autoFocus
           />
           <button
             onClick={handleSend}
-            className="px-8 py-3 bg-[#FF6600] text-white rounded-full font-semibold hover:bg-[#FF6600]/90 transition-all"
+            className="px-4 py-2 bg-[#FF6600] text-white rounded-full text-sm font-medium hover:bg-[#FF6600]/90 transition-all"
           >
             Send
           </button>

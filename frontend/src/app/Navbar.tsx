@@ -6,7 +6,7 @@ export default function Navbar() {
   return (
     <nav className="w-full bg-[#FF6600] text-white p-4 flex justify-between items-center shadow-md">
       <div className="flex items-center">
-        <Link href="/" className="hover:underline hover:underline-offset-4 flex items-center gap-2">
+        <Link href="/" className=" flex items-center gap-2">
           <Image 
             src="/logo.png" 
             alt="Complimo Logo" 
@@ -18,10 +18,10 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="flex gap-6 font-medium text-sm uppercase tracking-wider">
-        <a href="/chat" className="hover:underline hover:underline-offset-4 py-1">Monitor Compliance</a>
-        <a href="/" className="hover:underline hover:underline-offset-4 py-1">Home</a>
-        <a href="https://www.belimo.com/ch/en_GB/about/belimo/profile" className="hover:underline hover:underline-offset-4 py-1">About</a>
-        <a href="https://www.belimo.com/ch/en_GB/contact/channels/belimo-contacts" className="hover:underline hover:underline-offset-4 py-1">Contact</a>
+        <Link href="/chat" className="py-1  transition-all duration-300 hover:drop-shadow-glow-white">Monitor Compliance</Link>
+        <Link href="/" className="py-1  transition-all duration-300 hover:drop-shadow-glow-white">Home</Link>
+        <a href="https://www.belimo.com/ch/en_GB/about/belimo/profile" className="py-1">About</a>
+        <a href="https://www.belimo.com/ch/en_GB/contact/channels/belimo-contacts" className="py-1">Contact</a>
       </div>
     </nav>
   );

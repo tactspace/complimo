@@ -17,5 +17,5 @@ frontend/.env.development
 frontend/.env.production
 frontend/.env.test
 
-
 backend/chroma_db
+backend/uploads

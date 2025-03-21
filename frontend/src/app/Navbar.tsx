@@ -18,10 +18,10 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="flex gap-6 font-medium text-sm uppercase tracking-wider">
-        <a href="#" className="hover:underline hover:underline-offset-4 py-1">Home</a>
-        <a href="#" className="hover:underline hover:underline-offset-4 py-1">About</a>
-        <a href="#" className="hover:underline hover:underline-offset-4 py-1">Services</a>
-        <a href="#" className="hover:underline hover:underline-offset-4 py-1">Contact</a>
+        <a href="/chat" className="hover:underline hover:underline-offset-4 py-1">Monitor Compliance</a>
+        <a href="/" className="hover:underline hover:underline-offset-4 py-1">Home</a>
+        <a href="https://www.belimo.com/ch/en_GB/about/belimo/profile" className="hover:underline hover:underline-offset-4 py-1">About</a>
+        <a href="https://www.belimo.com/ch/en_GB/contact/channels/belimo-contacts" className="hover:underline hover:underline-offset-4 py-1">Contact</a>
       </div>
     </nav>
   );

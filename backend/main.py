@@ -13,6 +13,7 @@ import shutil
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import pandas as pd
+import json
 
 load_dotenv()
 app = FastAPI()
@@ -38,6 +39,9 @@ class ChatWithHistoryRequest(BaseModel):
 # Add this new response model above existing endpoints
 class HVACMetricsResponse(BaseModel):
     HVAC_Metrics: dict
+
+class SensorDataRequest(BaseModel):
+    sensor_data: dict
 
 # Initialize components (moved outside endpoint for efficiency)
 @app.on_event("startup")
@@ -237,6 +241,22 @@ async def get_hvac_metrics(step: int):
         }
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Metrics data not found")
+
+@app.post("/check-compliance")
+async def check_compliance_endpoint(request: SensorDataRequest):
+    try:
+        from compliance_checker import compliance_checker
+        
+        # Convert sensor data dict to JSON string
+        sensor_data = json.dumps(request.sensor_data)
+        
+        # Call compliance checker
+        compliance_results = compliance_checker(sensor_data)
+        
+        return compliance_results
+    except Exception as e:
+        print(f"Compliance check error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

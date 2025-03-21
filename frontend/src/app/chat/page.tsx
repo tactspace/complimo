@@ -26,7 +26,7 @@ export default function ChatPage() {
         {/* Main Compliance List - Now Center Stage */}
         <div className="flex-1 border-r border-gray-100 overflow-y-auto p-6">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">Compliance Requirements</h1>
+            <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Compliance Requirements</h1>
             <ComplianceList />
           </div>
         </div>

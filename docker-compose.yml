@@ -22,8 +22,8 @@ services:
     networks:
       - hvac-network
     # If you have a backend service that the frontend depends on
-    # depends_on:
-    #   - backend
+    depends_on:
+      - backend
 
   # Backend service (uncomment and adjust as needed)
   backend:

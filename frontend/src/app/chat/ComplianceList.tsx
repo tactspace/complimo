@@ -46,7 +46,7 @@ export default function ComplianceList() {
         <div className="text-center p-8 bg-gray-50 rounded-lg border border-dashed border-gray-200">
           <p className="text-gray-500 mb-4">
             No compliance requirements found. <br />
-            Please upload relevant regulations and click "Check Compliance"
+            Please upload relevant regulations and click `Check Compliance`
           </p>
 
           <div className="flex items-center justify-center gap-4 mb-4">

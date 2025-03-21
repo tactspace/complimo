@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import Image from "next/image";
 import Navbar from "./Navbar";
 
 interface PowerDataPoint {
@@ -16,6 +15,7 @@ interface FlowDataPoint {
 }
 
 interface HVACMetrics {
+  HVAC_Metrics: {
   Power_Consumption: {
     Absolute_Power_W: number;
   };
@@ -42,19 +42,7 @@ interface HVACMetrics {
     Flow_Signal_Faulty: boolean;
   };
 }
-
-interface MockData {
-  timestamp: string;
-  power: number;
-  flowPercentage: number;
 }
-
-// Mock real-time data generator
-const generateMockData = () => ({
-  timestamp: new Date().toLocaleTimeString(),
-  power: Math.floor(12000 + Math.random() * 1000),
-  flowPercentage: Math.floor(70 + Math.random() * 10)
-});
 
 export default function Home() {
   const [metrics, setMetrics] = useState<HVACMetrics>({
@@ -123,7 +111,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const interval = setInterval(fetchData, 5000);
+    const interval = setInterval(fetchData, 2500);
     // Initial fetch
     fetchData();
     return () => clearInterval(interval);
@@ -199,13 +187,7 @@ export default function Home() {
                     fill="#FF6600" 
                     radius={[4, 4, 0, 0]}
                   />
-                  <Line 
-                    type="horizontal" 
-                    dataKey="setpoint" 
-                    stroke="#ff0000" 
-                    strokeDasharray="5 5"
-                    dot={false}
-                  />
+                 
                 </BarChart>
               </ResponsiveContainer>
             </div>

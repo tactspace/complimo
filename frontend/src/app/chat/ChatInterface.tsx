@@ -10,21 +10,9 @@ interface Message {
 const mockMessages: Message[] = [
   {
     id: 1,
-    content: "Welcome to Complimo! How can I assist you today?",
+    content: "Hi, I'm Complimo, your AI agent for HVAC compliance monitoring. How can I assist you today?",
     isUser: false,
     timestamp: new Date(Date.now() - 60000)
-  },
-  {
-    id: 2,
-    content: "I need help with compliance regulations.",
-    isUser: true,
-    timestamp: new Date(Date.now() - 30000)
-  },
-  {
-    id: 3,
-    content: "I'd be happy to help. Could you specify which industry or region you're referring to?",
-    isUser: false,
-    timestamp: new Date(Date.now() - 15000)
   },
 ];
 
@@ -79,8 +67,16 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="flex flex-col h-screen  bg-white font-[family-name:var(--font-geist-sans)]">
-      <div className="flex-1 overflow-y-auto p-4">
+    <div className="flex flex-col h-screen bg-gray-100 font-[family-name:var(--font-geist-sans)]">
+      {/* Compliance Assistant Header */}
+      <div className="border-b p-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-xl font-semibold text-black">Compliance Assistant</h2>
+        </div>
+      </div>
+      
+      {/* Messages Container */}
+      <div className="flex-1 overflow-y-auto p-4 mt-12">
         <div className="max-w-3xl mx-auto space-y-4">
           {messages.map((message) => (
             <div
@@ -102,7 +98,7 @@ export default function ChatInterface() {
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="max-w-[50%] p-3 bg-gray-300 rounded-xl rounded-tl-sm mr-6">
+              <div className="max-w-[70%] p-3 bg-gray-300 rounded-xl rounded-tl-sm mr-6">
                 <div className="flex space-x-2 justify-center items-center">
                   <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                   <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
@@ -115,7 +111,7 @@ export default function ChatInterface() {
         </div>
       </div>
       
-      <div className="border-t p-4 bg-gray-50">
+      <div className=" p-4 bg-gray-100">
         <div className="max-w-3xl mx-auto flex gap-2">
           <input
             type="text"
@@ -123,7 +119,7 @@ export default function ChatInterface() {
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Type your message..."
-            className="flex-1 p-2 text-sm border text-black rounded-full focus:outline-none focus:ring-2 focus:ring-[#FF6600] pl-4"
+            className="flex-1 p-2 text-sm border text-black rounded-full focus:outline-none focus:ring-1 focus:ring-[#FF6600] pl-4"
             autoFocus
           />
           <button

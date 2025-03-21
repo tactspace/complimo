@@ -96,9 +96,9 @@ async def chat(request: ChatWithHistoryRequest):
             
             # Combine context with current query
             enhanced_query = f"""Previous conversation:
-{context}
+        {context}
 
-Based on this conversation history, please answer the user's current question: {query}. Answer in pure text, no markdown, no HTML."""
+        Based on this conversation history, please answer the user's current question: {query}. Answer in pure text, no markdown, no HTML."""
         else:
             enhanced_query = query
         

@@ -32,12 +32,12 @@ export default function ChatPage() {
         </div>
 
         {/* Right Panel - Compact Chat */}
-        <div className="w-96 border-l border-gray-100 flex flex-col">
+        <div className="w-96 border-l border-gray-100 bg-gray-100 flex flex-col">
           <div className="p-4 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-600">Compliance Assistant</h2>
           </div>
           <div className="flex-1 overflow-hidden">
-            <ChatInterface className="h-full" />
+            <ChatInterface />
           </div>
         </div>
       </div>

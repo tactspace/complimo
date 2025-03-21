@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Image from "next/image";
 import Navbar from "./Navbar";
@@ -59,25 +59,25 @@ const generateMockData = () => ({
 export default function Home() {
   const [metrics, setMetrics] = useState<HVACMetrics>({
     HVAC_Metrics: {
-      Power_Consumption: { Absolute_Power_W: 12500 },
+      Power_Consumption: { Absolute_Power_W: 0 },
       Temperature_Differential: {
-        Delta_Temperature_K: 6.5,
-        Setpoint_Delta_T_K: 7.0,
-        Temperature_1_Remote_K: 289.5,
-        Temperature_2_Embedded_K: 283.0
+        Delta_Temperature_K: 0,
+        Setpoint_Delta_T_K: 0,
+        Temperature_1_Remote_K: 0,
+        Temperature_2_Embedded_K: 0
       },
       Flow_Performance: {
-        Relative_Flow_Percentage: 75,
-        Absolute_Flow_m3_s: 0.03,
-        Flow_Volume_Total_m3: 14500
+        Relative_Flow_Percentage: 0,
+        Absolute_Flow_m3_s: 0,
+        Flow_Volume_Total_m3: 0
       },
       Energy_Consumption: {
-        Cooling_Energy_J: 4.2e9,
-        Heating_Energy_J: 2.8e9
+        Cooling_Energy_J: 0,
+        Heating_Energy_J: 0
       },
       Operational_Metrics: {
-        Operating_Time_h: 2500,
-        Active_Time_h: 1900
+        Operating_Time_h: 0,
+        Active_Time_h: 0
       },
       System_Status: {
         Flow_Signal_Faulty: false
@@ -85,36 +85,47 @@ export default function Home() {
     }
   });
   
-  const [powerData, setPowerData] = useState(() => 
-    Array.from({ length: 10 }, (_, i) => ({
-      timestamp: `${i * 5}s`,
-      kW: (12000 + Math.random() * 1000) / 1000
-    }))
-  );
+  const [powerData, setPowerData] = useState<PowerDataPoint[]>([]);
+  const [flowData, setFlowData] = useState<FlowDataPoint[]>([]);
+  const stepRef = useRef(1);
 
-  const [flowData, setFlowData] = useState(() => 
-    Array.from({ length: 10 }, (_, i) => ({
-      timestamp: `${i * 5}s`,
-      flow: 70 + Math.random() * 10,
-      setpoint: 75
-    }))
-  );
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Simulate real-time updates
-      setPowerData(prev => [...prev.slice(1), {
-        timestamp: new Date().toLocaleTimeString(),
-        kW: (generateMockData().power) / 1000
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `http://0.0.0.0:8000/hvac-metrics/${stepRef.current}`
+      );
+      if (!response.ok) throw new Error('Failed to fetch data');
+      
+      const data: HVACMetrics = await response.json();
+      console.log('Faulty?', data.HVAC_Metrics.System_Status.Flow_Signal_Faulty, stepRef);
+      
+      // Update metrics state
+      setMetrics(data);
+      
+      // Update chart data
+      const timestamp = new Date().toLocaleTimeString();
+      
+      setPowerData(prev => [...prev.slice(-9), {
+        timestamp,
+        kW: data.HVAC_Metrics.Power_Consumption.Absolute_Power_W / 1000
       }]);
       
-      setFlowData(prev => [...prev.slice(1), {
-        timestamp: new Date().toLocaleTimeString(),
-        flow: generateMockData().flowPercentage,
-        setpoint: 75
+      setFlowData(prev => [...prev.slice(-9), {
+        timestamp,
+        flow: data.HVAC_Metrics.Flow_Performance.Relative_Flow_Percentage,
+        setpoint: 75 // Setpoint from API or keep hardcoded
       }]);
-    }, 5000);
 
+      stepRef.current++;
+    } catch (error) {
+      console.error('Error fetching HVAC data:', error);
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(fetchData, 5000);
+    // Initial fetch
+    fetchData();
     return () => clearInterval(interval);
   }, []);
 
@@ -129,9 +140,15 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-black">HVAC System Dashboard</h2>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100">
-              <div className={`w-3 h-3 rounded-full ${false ? 'bg-red-500' : 'bg-green-500'}`}></div>
+              <div className={`w-3 h-3 rounded-full ${
+                metrics.HVAC_Metrics.System_Status.Flow_Signal_Faulty 
+                  ? 'bg-red-500' 
+                  : 'bg-green-500'
+              }`}></div>
               <span className="font-medium text-sm text-black">
-                {false ? 'Flow Signal Fault' : 'All Systems Normal'}
+                {metrics.HVAC_Metrics.System_Status.Flow_Signal_Faulty
+                  ? 'Flow Signal Fault' 
+                  : 'All Systems Normal'}
               </span>
             </div>
             <select 
@@ -147,7 +164,7 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Power Consumption Graph */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-black mb-4">Power Consumption Trend (W)</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Power Consumption Trend (kW)</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={powerData}>
@@ -203,16 +220,15 @@ export default function Home() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-black">Current ΔT</span>
-                    <span className="font-semibold text-black">{6.5}K</span>
+                    <span className="font-semibold text-black">{metrics.HVAC_Metrics.Temperature_Differential.Delta_Temperature_K.toFixed(2)}K</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-black/70">Setpoint</span>
-                    <span className="text-black/70">{7.0}K</span>
+                    <span className="text-black/70 font-semibold">{metrics.HVAC_Metrics.Temperature_Differential.Setpoint_Delta_T_K.toFixed(2)}K</span>
                   </div>
-                  <div className="flex gap-2 items-center text-sm">
-                    <div className="w-2 h-2 rounded-full text-black bg-green-500"></div>
-                    <span className="text-black">Remote: {289.5}K</span>
-                    <span className="text-black">Embedded: {283.0}K</span>
+                  <div className="flex gap-2 items-center text-sm w-full justify-between">
+                    <span className="text-black">Remote: {metrics.HVAC_Metrics.Temperature_Differential.Temperature_1_Remote_K.toFixed(2)}K</span>
+                    <span className="text-black">Embedded: {metrics.HVAC_Metrics.Temperature_Differential.Temperature_2_Embedded_K.toFixed(2)}K</span>
                   </div>
                 </div>
               </div>
@@ -223,13 +239,13 @@ export default function Home() {
                 <div className="flex justify-between items-center">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-[#FF6600]">
-                      {(4.2e9 / 1e9).toFixed(1)}
+                      {(metrics.HVAC_Metrics.Energy_Consumption.Cooling_Energy_J / 1e9).toFixed(1)}
                     </div>
                     <div className="text-sm text-black/70 mt-1">Cooling (GJ)</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-[#FF6600]">
-                      {(2.8e9 / 1e9).toFixed(1)}
+                      {(metrics.HVAC_Metrics.Energy_Consumption.Heating_Energy_J / 1e9).toFixed(1)}
                     </div>
                     <div className="text-sm text-black/70 mt-1">Heating (GJ)</div>
                   </div>
@@ -241,11 +257,11 @@ export default function Home() {
                 <h3 className="text-lg font-semibold text-black mb-4">Operational Hours</h3>
                 <div className="flex justify-between">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-black">{2500}</div>
+                    <div className="text-2xl font-bold text-black">{metrics.HVAC_Metrics.Operational_Metrics.Operating_Time_h}</div>
                     <div className="text-sm text-black/70">Total Hours</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-black">{1900}</div>
+                    <div className="text-2xl font-bold text-black">{metrics.HVAC_Metrics.Operational_Metrics.Active_Time_h}</div>
                     <div className="text-sm text-black/70">Active Hours</div>
                   </div>
                 </div>

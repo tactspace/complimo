@@ -22,25 +22,25 @@ services:
     networks:
       - hvac-network
     # If you have a backend service that the frontend depends on
-    # depends_on:
-    #   - backend
+    depends_on:
+      - backend
 
   # Backend service (uncomment and adjust as needed)
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   container_name: hvac-backend
-  #   ports:
-  #     - "8000:8000"
-  #   environment:
-  #     - PYTHONUNBUFFERED=1
-  #   volumes:
-  #     # Mount for development to enable hot reloading
-  #     - ./backend:/app
-  #   networks:
-  #     - hvac-network
-  #   restart: unless-stopped
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: hvac-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Mount for development to enable hot reloading
+      - ./backend:/app
+    networks:
+      - hvac-network
+    restart: unless-stopped
 
 networks:
   hvac-network:

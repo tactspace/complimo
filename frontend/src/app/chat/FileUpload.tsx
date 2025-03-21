@@ -4,12 +4,14 @@ import { useState } from 'react';
 export default function FileUpload() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       setIsLoading(true);
       setIsSuccess(false);
+      setUploadedFiles([]);
       
       const formData = new FormData();
       Array.from(files).forEach(file => {
@@ -25,9 +27,12 @@ export default function FileUpload() {
         if (!response.ok) {
           throw new Error('Failed to upload files');
         }
-        console.log('Files successfully indexed:', await response.json());
+        
+        const data = await response.json();
+        console.log('Files successfully indexed:', data);
+        setUploadedFiles(Array.from(files).map(file => file.name));
         setIsSuccess(true);
-        setTimeout(() => setIsSuccess(false), 3000); // Hide success after 3 seconds
+        // setTimeout(() => setIsSuccess(false), 3000);
       } catch (error) {
         console.error('Error uploading files:', error);
         setIsSuccess(false);
@@ -54,7 +59,17 @@ export default function FileUpload() {
               Uploading...
             </div>
           ) : isSuccess ? (
-            <div className="text-green-500">✓ Upload complete!</div>
+            <div className="text-green-500">
+              <div>✓ Upload complete!</div>
+              {uploadedFiles.length > 0 && (
+                <div className="mt-2 text-xs text-gray-600">
+                  Uploaded files:
+                  {uploadedFiles.map((fileName, index) => (
+                    <div key={index}>• {fileName}</div>
+                  ))}
+                </div>
+              )}
+            </div>
           ) : (
             'Click to upload or drag and drop'
           )}

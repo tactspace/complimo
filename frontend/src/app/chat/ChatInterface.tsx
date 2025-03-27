@@ -145,7 +145,7 @@ async function fetchChatResponse(query: string, messageHistory: Message[]): Prom
 
     console.log("History", conversationHistory);
 
-    const response = await fetch('http://0.0.0.0:8000/chat', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -80,7 +80,7 @@ export default function Home() {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `http://0.0.0.0:8000/hvac-metrics/${stepRef.current}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/hvac-metrics/${stepRef.current}`
       );
       if (!response.ok) throw new Error('Failed to fetch data');
       

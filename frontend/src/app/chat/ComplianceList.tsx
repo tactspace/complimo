@@ -17,10 +17,10 @@ export default function ComplianceList() {
   const handleCheckCompliance = async () => {
     setIsLoading(true);
     try {
-      const sensorResponse = await fetch('http://0.0.0.0:8000/hvac-metrics/5');
+      const sensorResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/hvac-metrics/5`);
       const sensorData = await sensorResponse.json();
 
-      const complianceResponse = await fetch('http://0.0.0.0:8000/check-compliance', {
+      const complianceResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/check-compliance`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sensor_data: sensorData })

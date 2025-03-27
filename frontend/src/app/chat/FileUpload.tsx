@@ -19,7 +19,7 @@ export default function FileUpload() {
       });
 
       try {
-        const response = await fetch('http://0.0.0.0:8000/index-pdf', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/index-pdf`, {
           method: 'POST',
           body: formData,
         });
@@ -32,7 +32,6 @@ export default function FileUpload() {
         console.log('Files successfully indexed:', data);
         setUploadedFiles(Array.from(files).map(file => file.name));
         setIsSuccess(true);
-        // setTimeout(() => setIsSuccess(false), 3000);
       } catch (error) {
         console.error('Error uploading files:', error);
         setIsSuccess(false);

@@ -19,3 +19,5 @@ frontend/.env.test
 
 backend/chroma_db
 backend/uploads
+backend/.env
+frontend/.env.local

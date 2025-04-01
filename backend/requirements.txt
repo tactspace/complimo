@@ -14,3 +14,4 @@ langchain-chroma
 python-multipart
 pandas
 langgraph
+PyPDF2

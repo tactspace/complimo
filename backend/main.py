@@ -258,6 +258,22 @@ async def check_compliance_endpoint(request: SensorDataRequest):
         print(f"Compliance check error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Endpoint to delete all documents from ChromaDB
+@app.get("/delete-documents")
+async def delete_documents():
+    try:
+        # Initialize Chroma connection
+        embedding_model = OpenAIEmbeddings()
+        chroma = Chroma(
+            persist_directory="./chroma_db",
+            embedding_function=embedding_model
+        )
+        chroma.delete_collection()
+        return {"message": "All documents deleted successfully"}
+    except Exception as e:  
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Complimo | HVAC Systems Compliance Agent",
+  title: "Compliot | HVAC Systems Compliance Agent",
   description: "Your AI Agent to handle compliance",
   icons: {
     icon: '/2.png',

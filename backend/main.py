@@ -14,6 +14,14 @@ from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import pandas as pd
 import json
+from fastapi.responses import HTMLResponse
+import tempfile
+from report_generator import (
+    preprocess_data,
+    generate_query,
+    search_regulations,
+    generate_report
+)
 
 load_dotenv()
 app = FastAPI()
@@ -34,7 +42,8 @@ class HistoryMessage(BaseModel):
 
 class ChatWithHistoryRequest(BaseModel):
     query: str
-    conversation_history: list[HistoryMessage] = []  # Optional, defaults to empty list
+    conversation_history: list[HistoryMessage] = []
+    sensor_data: dict = {}  # Add sensor data field
 
 # Add this new response model above existing endpoints
 class HVACMetricsResponse(BaseModel):
@@ -86,26 +95,70 @@ async def chat(request: ChatWithHistoryRequest):
         # Get the current query and conversation history
         query = request.query
         conversation_history = request.conversation_history
+
+        print(request)
+
+        df = pd.read_csv("data_points.csv")
+
+        # Choose a random row from the dataframe
+        row = df.sample(n=1).iloc[0].to_dict()
+
+        sensor_data = {
+            "HVAC_Metrics": {
+                "Power_Consumption": {"Absolute_Power_W": row["Absolute_Power_W"]},
+                "Temperature_Differential": {
+                    "Delta_Temperature_K": row["Delta_Temperature_K"],
+                    "Setpoint_Delta_T_K": row["Setpoint_Delta_T_K"],
+                    "Temperature_1_Remote_K": row["Temperature_1_Remote_K"],
+                    "Temperature_2_Embedded_K": row["Temperature_2_Embedded_K"]
+                },
+                "Flow_Performance": {
+                    "Relative_Flow_Percentage": row["Relative_Flow_Percentage"],
+                    "Absolute_Flow_m3_s": row["Absolute_Flow_m3_s"],
+                    "Flow_Volume_Total_m3": row["Flow_Volume_Total_m3"]
+                },
+                "Energy_Consumption": {
+                    "Cooling_Energy_J": row["Cooling_Energy_J"],
+                    "Heating_Energy_J": row["Heating_Energy_J"]
+                },
+                "Operational_Metrics": {
+                    "Operating_Time_h": row["Operating_Time_h"],
+                    "Active_Time_h": row["Active_Time_h"]
+                },
+                "System_Status": {
+                    "Flow_Signal_Faulty": bool(row["Flow_Signal_Faulty"])
+                }
+            }
+        }
         
-        # Format previous exchanges as context for the query if history exists
+        # Format sensor data as context
+        sensor_context = "\n".join(
+            [f"{k}: {v}" for k, v in sensor_data.items()]
+        ) if sensor_data else "No sensor data available"
+        
+        # Build enhanced query with both conversation history and sensor data
+        context_parts = []
         if conversation_history:
-            context = "\n\n".join([
+            context_parts.append("Previous conversation:\n" + "\n".join(
                 f"{'User' if msg.isUser else 'Assistant'}: {msg.content}" 
                 for msg in conversation_history
-            ])
-            
-            # Combine context with current query
-            enhanced_query = f"""Previous conversation:
-        {context}
+            ))
+        
+        context_parts.append(f"Current sensor data:\n{sensor_context}")
+        
+        enhanced_query = f"""
+        {''.join(context_parts)}
+        
+        Your task:
+        - Use the sensor data only when needed to answer the user's query. Organize the answer in a way that is easy to understand and follow up on. Reference key metrics and numeric values when appropriate.
+        - Use the conversation history to understand the user's query and respond accordingly.
+        Based on this conversation history and sensor data, please respond to the user's query: {query}
 
-        Based on this conversation history, please answer the user's current question: {query}. Answer in pure text, no markdown, no HTML."""
-        else:
-            enhanced_query = query
+        Format your responses properly. Add newlines and lists when appropriate.
         
-        # Generate response using RAG chain with the enhanced query
+        """
+        print('\n\n****************', enhanced_query, '\n\n****************')
         response = rag_chain.run(enhanced_query)
-        
-        # Return the response
         return {"response": response}
     
     except Exception as e:
@@ -272,7 +325,24 @@ async def delete_documents():
         return {"message": "All documents deleted successfully"}
     except Exception as e:  
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+@app.get("/generate-report", response_class=HTMLResponse)
+async def generate_report_endpoint():
+    """Generate compliance report from uploaded CSV data"""
+    try: 
+        temp_path = "data_points.csv"
+        # Process data and generate report
+        df = preprocess_data(temp_path)
+        similarity_search_query = generate_query(df)
+        requirements = search_regulations(similarity_search_query)
+        report_html = generate_report(requirements, df['columns'], df['data'])
+        
+        return HTMLResponse(
+            content=report_html,
+            headers={'Content-Disposition': 'inline; filename="report.html"'}
+        )
+    except Exception as e:
+        raise HTTPException(500, f"Report generation failed: {str(e)}")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

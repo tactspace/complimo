@@ -34,39 +34,35 @@ collection = Chroma(
 )._collection
 
 
-def generate_report(requirements_data: str, data_columns_description: str, analysis_data: str) -> str:
+def generate_report(requirements_data: str, data_columns_description: str, timeseries_data: str) -> str:
     """Analyze tabular data provided as JSON string."""
     try:
         llm = ChatOpenAI(model="gpt-4o", temperature=0.1)
-        
-        # If data is a list (multiple rows)
-        # prompt = ChatPromptTemplate.from_messages([
-        #     ("system", """You are a data analysis expert. The data is time series data, {data_description}. Analyze the provided JSON data and provide insights about:
-        #     1. The trends in the data including the peaks and troughs, deviation from the norm and the exact time period of such deviations.
-        #     2. Key insights about the data.
-        #     3. Factual interpretation of data and trends in the data.
-             
-        #     Document your analysis in a way that is easy to understand and follow using a simple yet professional tone. Write a full detailed report including any relevant graphs and charts.
-            
-        #     Format your response as a simple string with clear sections for insights. No markdown, no formatting.
-        #     """),
-        #     ("user", "Please analyze this data:\n\n {data}")
-        # ])
 
         prompt = ChatPromptTemplate.from_messages([
-        ("system", """You are a data analysis expert creating a formal PDF report for an Heating, Ventilation and Air conditioning (HVAC) insurance company who wants to know if a building is complying with the insurance requirements and is eligible to make claims. You are given some the description of columns and the analysis of the corresponding time series HVAC data. The data columns are as follows, {data_columns_description}. 
+        ("system", """You are a data analysis expert creating a formal PDF report for an Heating, Ventilation and Air conditioning (HVAC) insurance company who wants to know if a building is complying with the insurance requirements and is eligible to make claims. The columns are as follows-\n\n{data_columns_description}.\n\n
+
+         The time series data is as follows-\n\n{timeseries_data}.\n\n
          
-            Note: Prepare the report in pure HTML, no markdown.
-            Format all numbers with appropriate units and 2 decimal places where applicable. Emphasize on data driven insights and recommendations and put strong focus from an insurance provider's perspective on what is most relevant information to ensure if the building is eligible for insurance claims. Document your analysis in a way that is easy to understand and follow using a simple yet professional tone. 
+         Analyze the provided time series data and provide insights about:
+            1. The trends in the data including the peaks and troughs, deviation from the norm and the exact time period of such deviations.
+            2. Key insights about the data.
+            3. Factual interpretation of data and trends in the data.
+         
+         Based on the analysis you find and the requirements for the insurance claim I provide you, generate a report with respect to the data analysis and the requirements. Emphasize on data driven insights and practical recommendations and put strong focus from an insurance provider's perspective on what is most relevant information to ensure if the building is eligible for insurance claims. Document your analysis in a way that is easy to understand and follow using a simple professional tone. Do not include any useless information and keep the report quantitative and concise.
+         
+            Note: Prepare the report in pure HTML, no markdown. Use black font and use professional CSS styles.
+            Format all numbers with appropriate units and 2 decimal places where applicable. 
+         
             """),
-            ("user", "Following are the requirements for the insurance claim:\n\n {requirements_data}\n\n Please analyze this data and generate a report with respect to the data analysis and the requirements specified:\n\n {analysis_data}")
+            ("user", "Following are the requirements for the insurance claim:\n\n {requirements_data}\n\n ")
         ])
 
-        messages = prompt.format_messages(requirements_data=requirements_data, analysis_data=analysis_data, data_columns_description=data_columns_description)
+        messages = prompt.format_messages(requirements_data=requirements_data, timeseries_data=timeseries_data, data_columns_description=data_columns_description)
 
 
         # print length of prompt
-        print(len(prompt.format_messages(requirements_data=requirements_data, analysis_data=analysis_data, data_columns_description=data_columns_description)[0].content))
+        print(len(prompt.format_messages(requirements_data=requirements_data, timeseries_data=timeseries_data, data_columns_description=data_columns_description)[0].content))
 
         print(messages)
 
@@ -129,15 +125,15 @@ def analyze_data(data: dict) -> str:
         return f"Error analyzing data: {str(e)}"
 
 
-df = preprocess_data("data_points.csv")
-similarity_search_query = generate_query(df)
-requirements = search_regulations(similarity_search_query)
-analysis_data = analyze_data(df)
+# df = preprocess_data("data_points.csv")
+# similarity_search_query = generate_query(df)
+# requirements = search_regulations(similarity_search_query)
+# analysis_data = analyze_data(df)
 
-report = generate_report(requirements, preprocess_data("data_points.csv")['columns'], analysis_data)
+# report = generate_report(requirements, df['columns'], df['data'])
 
 # print(report)
 
-# Export the report to a html file
+# # Export the report to a html file
 # with open("report.html", "w") as f:
 #     f.write(report)

@@ -16,13 +16,13 @@ export default function Navbar() {
       if (response.status === 200) {
         toast.success('Documents deleted successfully!', {
           duration: 3000,
-          position: 'bottom-right',
+          position: 'bottom-center',
         });
       }
     } catch (error) {
       toast.error('Failed to delete documents', {
         duration: 3000,
-        position: 'bottom-right',
+        position: 'bottom-center',
       });
     }
   };
@@ -33,12 +33,12 @@ export default function Navbar() {
         <Link href="/" className=" flex items-center gap-2">
           <Image 
             src="/logo.png" 
-            alt="Complimo Logo" 
+            alt="Compliot Logo" 
             width={24} 
             height={24}
             className="h-6 w-auto"
           />
-          <span className="font-bold text-xl tracking-tight">Complimo</span>
+          <span className="font-bold text-xl tracking-tight">Compliot</span>
         </Link>
       </div>
       <div className="flex gap-6 font-medium text-sm uppercase tracking-wider">
@@ -63,13 +63,35 @@ export default function Navbar() {
                   {({ active }) => (
                     <Link
                       href={`${BASE_URL}/documents`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        try {
+                          const response = await axios.get(`${BASE_URL}/documents`);
+                          const uniqueFilenames = [...new Set(response.data.documents.map((doc: { filename: object }) => doc.source.split('/').pop()))];
+                          const filenames = uniqueFilenames.join(', \n');
+                          const message = response.data.count > 0 ? `Following documents have been uploaded: \n${filenames}` : 'No documents have been uploaded yet.';
+                          toast.success(message, {
+                            duration: 5000,
+                            position: 'bottom-center',
+                            style: {
+                              minWidth: '30%',
+                              fontSize: '16px',
+                              lineHeight: '1.5',
+                              padding: '20px'
+                            },
+                          });
+                        } catch (error) {
+                          toast.error('Failed to load documents', {
+                            duration: 3000,
+                            position: 'bottom-center',
+                          });
+                        }
+                      }}
                       className={`${
                         active ? 'bg-gray-100' : ''
                       } block px-4 py-2 text-sm text-gray-700`}
                     >
-                      VIEW DOCUMENTS
+                      CHECK DOCUMENTS
                     </Link>
                   )}
                 </Menu.Item>
@@ -88,12 +110,12 @@ export default function Navbar() {
                 <Menu.Item>
                   {({ active }) => (
                     <Link
-                      href="/admin/generate-report"
+                      href={`${BASE_URL}/generate-report`}
                       className={`${
                         active ? 'bg-gray-100' : ''
                       } block px-4 py-2 text-sm text-gray-700`}
                     >
-                      Generate Report
+                      GENERATE REPORT
                     </Link>
                   )}
                 </Menu.Item>

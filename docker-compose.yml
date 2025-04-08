@@ -10,8 +10,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      # Configure backend API URL if needed
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_BASE_URL=https://try.tactspace.io/api
     restart: unless-stopped
     volumes:
       - ./frontend/public:/app/public

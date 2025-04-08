@@ -25,6 +25,7 @@ WORKDIR /app
 # Set environment to production
 ENV NODE_ENV=production
 # ENV NEXT_PUBLIC_BASE_URL=https://try.tactspace.io/api
+ENV NEXT_PUBLIC_BASE_URL=https://try.tactspace.io/api
 
 # Copy necessary files from the builder stage
 COPY --from=builder /app/public ./public

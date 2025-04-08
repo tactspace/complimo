@@ -1,4 +1,4 @@
-# Complimo - AI Agent for HVAC Compliance
+# Compliot - AI Agent for HVAC Compliance
 
 ![Complimo_Logo](https://github.com/user-attachments/assets/7b7be200-a4e5-44cc-b4fc-bc5ae4d66be5)
 

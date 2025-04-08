@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
   id: number;
@@ -10,7 +12,7 @@ interface Message {
 const mockMessages: Message[] = [
   {
     id: 1,
-    content: "Hi, I'm Complimo, your AI agent for HVAC compliance monitoring. How can I assist you today?",
+    content: "Hi, I'm Compliot, your AI agent for HVAC compliance monitoring. How can I assist you today?",
     isUser: false,
     timestamp: new Date(Date.now() - 60000)
   },
@@ -90,9 +92,11 @@ export default function ChatInterface() {
                     : 'bg-gray-300 rounded-xl rounded-tl-sm mr-6'
                 }`}
               >
-                <p className={`text-sm leading-snug ${message.isUser ? 'text-white' : 'text-gray-600'}`}>
-                  {message.content}
-                </p>
+                <div className={`text-sm leading-snug ${message.isUser ? 'text-white' : 'text-gray-600'}`}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {message.content}
+                  </ReactMarkdown>
+                </div>
               </div>
             </div>
           ))}

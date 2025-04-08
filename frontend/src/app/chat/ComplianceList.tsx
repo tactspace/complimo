@@ -5,7 +5,7 @@ interface ComplianceDocument {
   id: number;
   regulation: string;
   compliance_issues: string;
-  status: 'non-compliant' | 'completed' | 'in-progress';
+  status: 'non-compliant' | 'compliant' | 'in-progress';
   next_steps: string;
 }
 
@@ -32,6 +32,8 @@ export default function ComplianceList() {
         doc.id = i;
         i++;
       }
+
+      console.log(complianceData);
       setComplianceDocuments(complianceData);
     } catch (error) {
       console.error('Error fetching compliance data:', error);
@@ -69,11 +71,11 @@ export default function ComplianceList() {
             <div className="flex items-center justify-between mb-1">
               <span className="text-sm font-bold text-black">{doc.regulation}</span>
               <div className="flex items-center gap-2">
-                <span className={`text-xs px-2 py-1 rounded-full ${doc.status === 'completed' ? 'bg-green-100 text-green-700' :
+                <span className={`text-xs px-2 py-1 rounded-full ${doc.status === 'compliant' ? 'bg-green-100 text-green-700' :
                     doc.status === 'in-progress' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-red-100 border-red text-red-700 font-semibold'
                   }`}>
-                  {doc.status}
+                  {doc.status.toLowerCase()}
                 </span>
                 <div className="relative">
                   <button

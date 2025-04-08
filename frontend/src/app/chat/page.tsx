@@ -10,7 +10,7 @@ export default function ChatPage() {
       <Navbar />
       <div className="flex-1 flex flex-row overflow-hidden">
         {/* Left Panel - File Upload */}
-        <div className="w-64 border-r border-gray-100 p-4 bg-gray-100 flex flex-col">
+        <div className="w-1/5 border-r border-gray-100 p-4 bg-gray-100 flex flex-col">
           <h2 className="text-sm font-semibold text-gray-600 mb-4">Upload Documents</h2>
           <FileUpload />
           <div className="mt-4 text-sm text-gray-500">
@@ -32,7 +32,7 @@ export default function ChatPage() {
         </div>
 
         {/* Right Panel - Compact Chat */}
-        <div className="w-96 border-l border-gray-100 bg-gray-100 flex flex-col">
+        <div className="w-1/4 border-l border-gray-100 bg-gray-100 flex flex-col">
           <div className="p-4 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-600">Compliance Assistant</h2>
           </div>

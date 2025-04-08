@@ -21,3 +21,5 @@ backend/chroma_db
 backend/uploads
 backend/.env
 frontend/.env.local
+
+.DS_Store

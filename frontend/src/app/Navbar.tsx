@@ -20,7 +20,7 @@ export default function Navbar() {
         });
       }
     } catch (error) {
-      toast.error('Failed to delete documents', {
+      toast.error('Failed to delete documents: ' + error, {
         duration: 3000,
         position: 'bottom-center',
       });
@@ -67,7 +67,7 @@ export default function Navbar() {
                         e.preventDefault();
                         try {
                           const response = await axios.get(`${BASE_URL}/documents`);
-                          const uniqueFilenames = [...new Set(response.data.documents.map((doc: { filename: object }) => doc.source.split('/').pop()))];
+                          const uniqueFilenames = [...new Set(response.data.documents.map((doc: { source: string }) => doc.source.split('/').pop()))];
                           const filenames = uniqueFilenames.join(', \n');
                           const message = response.data.count > 0 ? `Following documents have been uploaded: \n${filenames}` : 'No documents have been uploaded yet.';
                           toast.success(message, {
@@ -81,7 +81,7 @@ export default function Navbar() {
                             },
                           });
                         } catch (error) {
-                          toast.error('Failed to load documents', {
+                          toast.error('Failed to load documents: ' + error, {
                             duration: 3000,
                             position: 'bottom-center',
                           });
@@ -123,6 +123,15 @@ export default function Navbar() {
             </Menu.Items>
           </Transition>
         </Menu>
+        
+        <a 
+          href="https://calendar.app.google/HvnHwCW9R8x9nWCN7" 
+          target="_blank"
+          rel="noopener noreferrer"
+          className="py-1 transition-all duration-300 hover:drop-shadow-glow-white"
+        >
+          BOOK A DEMO
+        </a>
       </div>
       <Toaster />
     </nav>

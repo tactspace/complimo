@@ -22,7 +22,7 @@ from report_generator import (
     search_regulations,
     generate_report
 )
-
+from compliance_checker import ComplianceChecker
 load_dotenv()
 app = FastAPI()
 
@@ -55,7 +55,7 @@ class SensorDataRequest(BaseModel):
 # Initialize components (moved outside endpoint for efficiency)
 @app.on_event("startup")
 def startup_db_client():
-    global rag_chain
+    global rag_chain, llm, retriever, collection, embedding_model
     
     # Initialize embedding model
     embedding_model = OpenAIEmbeddings()
@@ -298,13 +298,14 @@ async def get_hvac_metrics(step: int):
 @app.post("/check-compliance")
 async def check_compliance_endpoint(request: SensorDataRequest):
     try:
-        from compliance_checker import compliance_checker
         
         # Convert sensor data dict to JSON string
         sensor_data = json.dumps(request.sensor_data)
         
         # Call compliance checker
-        compliance_results = compliance_checker(sensor_data)
+        compliance_checker = ComplianceChecker(llm=llm, retriever=retriever, embeddings=embedding_model, collection=collection)
+
+        compliance_results = compliance_checker.compliance_check(sensor_data)
         
         return compliance_results
     except Exception as e:
@@ -315,13 +316,21 @@ async def check_compliance_endpoint(request: SensorDataRequest):
 @app.get("/delete-documents")
 async def delete_documents():
     try:
-        # Initialize Chroma connection
+        global rag_chain
         embedding_model = OpenAIEmbeddings()
+        
+        # Delete existing collection
         chroma = Chroma(
             persist_directory="./chroma_db",
             embedding_function=embedding_model
         )
-        chroma.delete_collection()
+        # chroma.delete_collection()
+        # Fetch all documents
+        docs = collection.get()
+
+        # Delete fetched documents
+        collection.delete(ids=docs['ids'])
+
         return {"message": "All documents deleted successfully"}
     except Exception as e:  
         raise HTTPException(status_code=500, detail=str(e))
